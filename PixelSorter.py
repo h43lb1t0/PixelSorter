@@ -7,38 +7,43 @@ from perlin_numpy import generate_fractal_noise_2d
 from Enums import SortDirection
 
 
+import numpy as np
+
 class SortBy:
     """Class with static methods for sorting pixels by different criteria."""
+
+    @staticmethod
+    def _get_luminance(rgb_slice: np.ndarray) -> np.ndarray:
+        """Helper to calculate luminance for a slice of RGB pixels (assumes R=0, G=1, B=2)."""
+        return 0.2126 * rgb_slice[:, 0] + 0.7152 * rgb_slice[:, 1] + 0.0722 * rgb_slice[:, 2]
+
+    # --- Core Class Methods ---
 
     @classmethod
     def list_static_methods(cls):
         """Return all static method names in this class, excluding this one."""
         return [
             name for name, obj in cls.__dict__.items()
-            if isinstance(obj, staticmethod) and name != "list_static_methods"
+            if isinstance(obj, staticmethod) and name != "list_static_methods" and not name.startswith("_")
         ]
 
-    def _get_luminance(self, rgb_slice: np.ndarray) -> np.ndarray:
-        """Helper to calculate luminance for a slice of RGB pixels."""
-        if rgb_slice.ndim == 1: # Handle single pixel case
-            return 0.2126 * rgb_slice[0] + 0.7152 * rgb_slice[1] + 0.0722 * rgb_slice[2]
-        return 0.2126 * rgb_slice[:, 0] + 0.7152 * rgb_slice[:, 1] + 0.0722 * rgb_slice[:, 2]
-    
+    # --- Sorting Keys (Color Space) ---
+
     @staticmethod
     def hue() -> callable:
         """Sort by hue, then saturation, then brightness (HSV)."""
         return lambda rgb, hsv, lab, idx: (hsv[:, 0], hsv[:, 1], hsv[:, 2])
-    
+
     @staticmethod
     def saturation() -> callable:
         """Sort by saturation, then brightness, then hue (HSV)."""
         return lambda rgb, hsv, lab, idx: (hsv[:, 1], hsv[:, 2], hsv[:, 0])
-    
+
     @staticmethod
     def brightness() -> callable:
         """Sort by brightness (Value from HSV), then saturation, then hue."""
         return lambda rgb, hsv, lab, idx: (hsv[:, 2], hsv[:, 1], hsv[:, 0])
-    
+
     @staticmethod
     def lightness() -> callable:
         """Sort by lightness (L* from Lab color space), which is perceptually uniform."""
@@ -47,7 +52,66 @@ class SortBy:
     @staticmethod
     def luminance() -> callable:
         """Sort by luminance (calculated perceived brightness from RGB)."""
-        return lambda rgb, hsv, lab, idx: (SortBy()._get_luminance(rgb),)
+        return lambda rgb, hsv, lab, idx: (SortBy._get_luminance(rgb),)
+
+    # --- Sorting Keys (RGB Channels) ---
+    
+    @staticmethod
+    def color() -> callable:
+        """Sorts by the colors of the image (R, G, B)."""
+        # Fix: Indexing corrected to R=0, G=1, B=2
+        return lambda rgb, hsv, lab, idx: (rgb[:, 0], rgb[:, 1], rgb[:, 2])
+
+    @staticmethod
+    def red() -> callable:
+        """Sort by red channel intensity (R=0)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 0],)
+
+    @staticmethod
+    def green() -> callable:
+        """Sort by green channel intensity (G=1)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 1],)
+
+    @staticmethod
+    def blue() -> callable:
+        """Sort by blue channel intensity (B=2)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 2],)
+
+    @staticmethod
+    def alpha() -> callable:
+        """
+        Sort by alpha channel intensity (A=3).
+        Note: This assumes the input image has an alpha channel."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 3],)
+    
+    @staticmethod
+    def warmth() -> callable:
+        """Sort by warmth (red + green - blue, assuming R=0, G=1, B=2)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 0] + rgb[:, 1] - rgb[:, 2],)
+
+    # --- Sorting Keys (Positional) ---
+
+    @staticmethod
+    def _key_gen_distance_center(rgb, hsv, lab, idx):
+        """Sorts pixels from the middle of the slice outwards."""
+        center = np.mean(idx)
+        return (np.abs(idx - center), SortBy._get_luminance(rgb))
+
+    @staticmethod
+    def distance_center() -> callable:
+        """Sort by distance from the center of the image (closest first)."""
+        return SortBy._key_gen_distance_center
+    
+    @staticmethod
+    def _key_gen_distance_edges(rgb, hsv, lab, idx):
+        """Sorts pixels from the edges of the slice inwards."""
+        center = np.mean(idx)
+        return (-np.abs(idx - center), SortBy._get_luminance(rgb))
+
+    @staticmethod
+    def distance_edges() -> callable:
+        """Sort by distance from the edges of the image (farthest first)."""
+        return SortBy._key_gen_distance_edges
 
 class Image():
     """Class for image processing tasks."""
