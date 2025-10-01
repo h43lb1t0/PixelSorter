@@ -9,14 +9,14 @@ image = Image.load_image(input__image_path)
 
 mask = YoloSegmentation(image).get_mask(
     what_to_sort=WhatToSort.BACKGROUND,
-    conf=.4,
+    conf=.35,
     blur_include=.5,
-    blur_extend=1
+    blur_extend=.7
 )
 
 sorted_image = PixelSorter(image).sort_pixels(
     sort_by=SortBy.luminance(),
-    direction=SortDirection.ROW_LEFT_TO_RIGHT,
+    direction=SortDirection.COLUMN_BOTTOM_TO_TOP,
     mask=mask,
     use_perlin=False
 )

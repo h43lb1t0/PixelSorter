@@ -252,6 +252,62 @@ class PixelSorter():
 
                 temp_sorted_image[sort_indices_col, x, :] = col_rgb[sorted_order]
         
+        elif direction in (SortDirection.SPIRALE_INWARD, SortDirection.SPIRALE_OUTWARD):
+            # Generate coordinates for a clockwise, inward spiral path
+            coords = []
+            top, bottom, left, right = 0, self.height - 1, 0, self.width - 1
+            while top <= bottom and left <= right:
+                # Move right (top edge)
+                for x in range(left, right + 1):
+                    coords.append((top, x))
+                top += 1
+                
+                # Move down (right edge)
+                for y in range(top, bottom + 1):
+                    coords.append((y, right))
+                right -= 1
+                
+                if not (top <= bottom and left <= right):
+                    break
+                    
+                # Move left (bottom edge)
+                for x in range(right, left - 1, -1):
+                    coords.append((bottom, x))
+                bottom -= 1
+                
+                # Move up (left edge)
+                for y in range(bottom, top - 1, -1):
+                    coords.append((y, left))
+                left += 1
+
+            # Filter the spiral path to include only pixels within the mask
+            coords_np = np.array(coords)
+            mask_values_on_path = final_mask[coords_np[:, 0], coords_np[:, 1]]
+            
+            sortable_indices_on_path = np.where(mask_values_on_path > 0)[0]
+            
+            if len(sortable_indices_on_path) >= 2:
+                coords_to_sort = coords_np[sortable_indices_on_path]
+
+                # Extract pixel data from the image using the filtered coordinates
+                ys, xs = coords_to_sort[:, 0], coords_to_sort[:, 1]
+                
+                spiral_rgb = image_for_sorting[ys, xs, :]
+                spiral_hsv = hsv_for_sorting[ys, xs, :]
+                spiral_lab = lab_for_sorting[ys, xs, :]
+                indices_in_slice = np.arange(len(ys))
+
+                # Get sort keys and determine the sorted order
+                sort_keys = sort_by(spiral_rgb, spiral_hsv, spiral_lab, indices_in_slice)
+                sorted_order = np.lexsort(sort_keys[::-1])
+                
+                # The generated path is inward. For outward sorting, we reverse the sorted order.
+                if direction == SortDirection.SPIRALE_OUTWARD:
+                    sorted_order = sorted_order[::-1]
+                
+                # Place the sorted pixels back into their original locations on the spiral path
+                temp_sorted_image[ys, xs, :] = spiral_rgb[sorted_order]
+        
         final_image = (alpha_3_channel * temp_sorted_image + (1 - alpha_3_channel) * original_image).astype(np.uint8)
         
         return final_image
