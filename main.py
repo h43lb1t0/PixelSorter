@@ -3,7 +3,10 @@ from PixelSorter import PixelSorter, Image, SortBy
 from Enums import WhatToSort, SortDirection
 
 input__image_path = "examples/alone-4480442.jpg"
-output_path = "examples/out/out.png"
+output_dir = "examples/out/"
+
+input_image_name = input__image_path.split("/")[-1].split("\\")[-1].split(".")[0]
+output_path = f"{output_dir}{input_image_name}_sorted.png"
 
 image = Image.load_image(input__image_path)
 
