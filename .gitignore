@@ -12,3 +12,5 @@ wheels/
 # Other
 *.pt
 examples/*
+output/*
+main.py
