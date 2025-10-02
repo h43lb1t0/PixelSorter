@@ -8,14 +8,14 @@ from Enums import WhatToSort
 class YoloSegmentation():
     """Class for performing YOLO segmentation on images."""
 
-    def __init__(self, image: np.ndarray):
+    def __init__(self, image: np.ndarray, model_path: str = "yolov8x-seg.pt"):
         """
         Initializes the YoloSegmentation class.
 
         Args:
             image (np.ndarray): The input image as a NumPy array.
         """
-        self.model_path = "yolov8x-seg.pt" #"yolo12l-person-seg-extended.pt" 
+        self.model_path = model_path #"yolo12l-person-seg-extended.pt" 
         self.model = YOLO(self.model_path)
         self.image = image
 

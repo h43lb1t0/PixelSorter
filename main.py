@@ -2,7 +2,7 @@ from MaskHandler import YoloSegmentation
 from PixelSorter import PixelSorter, Image, SortBy
 from Enums import WhatToSort, SortDirection
 
-input__image_path = "examples/alone-4480442.jpg"
+input__image_path = r"e:\Bilder\Photos-1-001\bearbeitet_DSC232116.jpg"
 output_dir = "examples/out/"
 
 input_image_name = input__image_path.split("/")[-1].split("\\")[-1].split(".")[0]
@@ -10,10 +10,10 @@ output_path = f"{output_dir}{input_image_name}_sorted.png"
 
 image = Image.load_image(input__image_path)
 
-mask = YoloSegmentation(image).get_mask(
-    what_to_sort=WhatToSort.BACKGROUND,
+mask = YoloSegmentation(image, model_path="yolo12l-person-seg-extended.pt").get_mask(
+    what_to_sort=WhatToSort.FOREGROUND,
     conf=.35,
-    blur_include=.5,
+    blur_include=.7,
     blur_extend=.7
 )
 

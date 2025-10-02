@@ -7,5 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "opencv-python>=4.12.0.88",
     "perlin-numpy>=0.0.1",
+    "pillow>=11.3.0",
+    "tkinterdnd2>=0.4.3",
     "ultralytics>=8.3.204",
 ]
