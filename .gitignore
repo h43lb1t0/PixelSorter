@@ -13,3 +13,4 @@ wheels/
 *.pt
 examples/*
 output/*
+main.py
