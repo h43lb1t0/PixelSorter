@@ -21,10 +21,21 @@ powerful Python application for glitch art and creative image manipulation throu
     ```
 
 ## Usage
+
+All parameters are explained [here](#pixel-sorting-options).
+The masking options are explained [here](#options).
+### UI
+Run the UI application:
+```bash
+python UI.py
+```
+
+### Code
+
 Open the `main.py` file and modify the parameters as needed:
 - `input_image_path`: Path to the input image.
 
-## Masks
+#### Masks
 
 If you do not want to use YOLOv8 object segmentation, comment out or remove the following lines:
 ```python
