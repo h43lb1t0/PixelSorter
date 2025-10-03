@@ -13,4 +13,6 @@ wheels/
 *.pt
 examples/*
 output/*
+out/*
 main.py
+foo.txt
