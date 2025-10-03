@@ -30,6 +30,51 @@ Run the UI application:
 python UI.py
 ```
 
+### Command Line Interface (CLI)
+```bash
+usage: cli.py [-h] -i INPUT [-o OUTPUT] [-mi MASK_IMAGE] [-smo] [-yo]
+              [-m MODEL] [-c CONF] [-bi BLUR_INCLUDE] [-be BLUR_EXTEND]
+              [-ws {BACKGROUND,FOREGROUND,ALL}]
+              [-sb {hue,saturation,brightness,lightness,luminance,color,red,green,blue,alpha,warmth,distance_center,distance_edges}]
+              [-sd {ROW_LEFT_TO_RIGHT,ROW_RIGHT_TO_LEFT,COLUMN_TOP_TO_BOTTOM,COLUMN_BOTTOM_TO_TOP,SPIRALE_INWARD,SPIRALE_OUTWARD}]
+              [-p]
+
+A powerful pixel sorting tool with advanced masking capabilities.
+
+options:
+  -h, --help            show this help message and exit
+
+Input/Output:
+  -i, --input INPUT     Path to the input image or directory.
+  -o, --output OUTPUT   Directory to save the sorted image(s). (Default: out/)
+
+Masking Options:
+  -mi, --mask-image MASK_IMAGE
+                        Path to a custom black-and-white mask image.
+                        This will override any YOLO-generated mask.
+  -smo, --save-mask-only
+                        Generate and save only the mask without sorting pixels.
+                        Requires the --yolo flag.
+
+YOLO Segmentation Options:
+  -yo, --yolo           Use a YOLO model to automatically generate a mask from detected objects.
+  -m, --model MODEL     The YOLO segmentation model to use. (Default: yolov8n-seg.pt)
+  -c, --conf CONF       Confidence threshold for YOLO object detection (0.0 to 1.0). (Default: 0.35)
+  -bi, --blur-include BLUR_INCLUDE
+                        Blur include threshold for mask. (Default: 0.5)
+  -be, --blur-extend BLUR_EXTEND
+                        Blur extend threshold for mask. (Default: 0.7)
+  -ws, --what-to-sort {BACKGROUND,FOREGROUND,ALL}
+                        Specifies which part of the mask to sort. (Default: BACKGROUND)
+
+Sorting Options:
+  -sb, --sort-by {hue,saturation,brightness,lightness,luminance,color,red,green,blue,alpha,warmth,distance_center,distance_edges}
+                        Method for sorting pixels. (Default: hue)
+  -sd, --sort-direction {ROW_LEFT_TO_RIGHT,ROW_RIGHT_TO_LEFT,COLUMN_TOP_TO_BOTTOM,COLUMN_BOTTOM_TO_TOP,SPIRALE_INWARD,SPIRALE_OUTWARD}
+                        The direction or pattern for the sorting algorithm. (Default: ROW_LEFT_TO_RIGHT)
+  -p, --use-perlin      Introduce Perlin noise to randomize the sorting process.
+```
+
 ### Code
 
 Open the `main.py` file and modify the parameters as needed:
