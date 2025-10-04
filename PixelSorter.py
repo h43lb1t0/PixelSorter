@@ -209,7 +209,7 @@ class PixelSorter():
         original_image = self.image.copy()
         temp_sorted_image = image_for_sorting.copy() # This will hold the fully sorted pixels
 
-        final_mask = mask
+        final_mask = None if mask is None else mask[:, :, 0] if len(mask.shape) == 3 else mask
         if final_mask is None:
             final_mask = np.full((self.height, self.width), 255, dtype=np.uint8)
 
