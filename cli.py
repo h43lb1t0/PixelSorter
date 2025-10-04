@@ -1,5 +1,7 @@
 import pathlib
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+
+import cv2
 from Enums import WhatToSort, SortDirection
 from MaskHandler import YoloSegmentation
 from PixelSorter import Image, PixelSorter, SortBy
@@ -164,7 +166,7 @@ def main():
             print(f"-> Using custom mask: {args.mask_image}")
             mask_path = pathlib.Path(args.mask_image)
             if mask_path.exists():
-                mask = Image.load_image(str(mask_path))
+                mask = Image.load_image(str(mask_path), cv2.IMREAD_GRAYSCALE)
             else:
                 print(f"Warning: Custom mask '{mask_path}' not found. Sorting entire image.")
 
