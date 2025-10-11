@@ -233,7 +233,13 @@ class PixelSorter():
         self.lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
 
 
-    def _add_perlin_to_image(self, image: np.ndarray, scale: float = 150.0, octaves: int = 4, intensity: float = 0.05) -> np.ndarray:
+    def _add_perlin_to_image(
+            self, 
+            image: np.ndarray, 
+            scale: float = 150.0, 
+            octaves: int = 4, 
+            intensity: float = 0.05
+            ) -> np.ndarray:
         """
         Generate a smoothed random noise map and add it to the image.
 
@@ -272,7 +278,12 @@ class PixelSorter():
         return noisy_image
 
 
-    def sort_pixels(self, sort_by: callable, direction: SortDirection, mask: np.ndarray = None, use_perlin: bool = False) -> np.ndarray:
+    def sort_pixels(
+            self,
+            sort_by: callable, 
+            direction: SortDirection, 
+            mask: np.ndarray = None, 
+            use_perlin: bool = False) -> np.ndarray:
         """
         Sorts pixels in an image based on specified criteria and an optional grayscale mask.
         If a grayscale mask is provided, the sorted image is blended with the original

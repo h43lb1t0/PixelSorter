@@ -32,7 +32,14 @@ class YoloSegmentation():
         print(f"Detected {len(results[0].boxes)} objects with confidence >= {conf}")
         return results[0]
 
-    def get_mask(self, image: np.ndarray, what_to_sort: WhatToSort, conf: float = 0.4, blur_include: float = 1.0, blur_extend: float = 0.0) -> np.ndarray:
+    def get_mask(
+            self, 
+            image: np.ndarray, 
+            what_to_sort: WhatToSort, 
+            conf: float = 0.4, 
+            blur_include: float = 1.0, 
+            blur_extend: float = 0.0
+            ) -> np.ndarray:
         """
         Creates a mask based on the desired sorting target.
         The mask can be grayscale with soft edges, allowing for a "melting" effect.
