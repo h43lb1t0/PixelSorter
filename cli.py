@@ -36,6 +36,12 @@ def main():
         default="out/",
         help="Directory to save the sorted image(s). (Default: %(default)s)"
     )
+    io_group.add_argument(
+        "-ow", "--overwrite",
+        action="store_true",
+        default=False,
+        help="Overwrite an image if it already exists in the output directory. (Default: %(default)s)\nIf not set, a numeric suffix will be added to the output filename to avoid overwriting."
+    )
 
     # --- Masking Group ---
     mask_group = parser.add_argument_group("Masking Options")
@@ -204,6 +210,13 @@ def main():
 
             # --- Saving Output ---
             output_path = output_dir / f"{stem}_sorted{suffix}"
+            if not args.overwrite:
+                if output_path.exists():
+                    # If the output path exists and we're not overwriting, add a numeric suffix
+                    i = 1
+                    while output_path.exists():
+                        output_path = output_dir / f"{stem}_sorted_{i}{suffix}"
+                        i += 1
             Image.save_image(sorted_image, output_path)
             print(f"   Saved sorted image to '{output_path}'")
         captured_output = f.getvalue().strip()
