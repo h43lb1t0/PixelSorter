@@ -509,8 +509,8 @@ class PixelSorterApp(TkinterDnD.Tk):
             original_pil_image = PILImage.open(input_path)
             model_path = self.yolo_model_path.get() or "yolo12l-person-seg-extended.pt"
             what_to_sort_enum = getattr(WhatToSort, self.what_to_sort_var.get())
-            segmenter = YoloSegmentation(image_for_library, model_path=model_path)
-            mask_array = segmenter.get_mask(what_to_sort=what_to_sort_enum, conf=self.yolo_conf_var.get(),
+            segmenter = YoloSegmentation(model_path=model_path)
+            mask_array = segmenter.get_mask(image=image_for_library, what_to_sort=what_to_sort_enum, conf=self.yolo_conf_var.get(),
                                              blur_include=self.yolo_blur_include_var.get(), blur_extend=self.yolo_blur_extend_var.get())
             if mask_array.dtype != np.uint8:
                 mask_array = (mask_array * 255).astype(np.uint8)

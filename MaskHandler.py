@@ -8,16 +8,15 @@ from Enums import WhatToSort
 class YoloSegmentation():
     """Class for performing YOLO segmentation on images."""
 
-    def __init__(self, image: np.ndarray, model_path: str = "yolov8x-seg.pt"):
+    def __init__(self, model_path: str = "yolov8x-seg.pt"):
         """
         Initializes the YoloSegmentation class.
 
         Args:
-            image (np.ndarray): The input image as a NumPy array.
+            model_path (str): The path to the YOLO model file.
         """
-        self.model_path = model_path #"yolo12l-person-seg-extended.pt" 
+        self.model_path = model_path 
         self.model = YOLO(self.model_path)
-        self.image = image
 
     def _segment(self, conf: float) -> Results:
         """
@@ -33,12 +32,13 @@ class YoloSegmentation():
         print(f"Detected {len(results[0].boxes)} objects with confidence >= {conf}")
         return results[0]
 
-    def get_mask(self, what_to_sort: WhatToSort, conf: float = 0.4, blur_include: float = 1.0, blur_extend: float = 0.0) -> np.ndarray:
+    def get_mask(self, image: np.ndarray, what_to_sort: WhatToSort, conf: float = 0.4, blur_include: float = 1.0, blur_extend: float = 0.0) -> np.ndarray:
         """
         Creates a mask based on the desired sorting target.
         The mask can be grayscale with soft edges, allowing for a "melting" effect.
 
         Args:
+            image (np.ndarray): The input image on which to perform segmentation.
             what_to_sort (WhatToSort): Enum indicating whether to create a mask for
                                      the background, foreground, or all pixels.
             conf (float, optional): The confidence threshold for object detection. Defaults to 0.4.
@@ -57,6 +57,7 @@ class YoloSegmentation():
                         If blur is applied, this will be a grayscale mask. Otherwise,
                         it will be a binary mask (0s and 255s).
         """
+        self.image = image
         height, width = self.image.shape[:2]
 
         if what_to_sort == WhatToSort.ALL:
