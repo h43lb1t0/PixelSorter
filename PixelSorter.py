@@ -12,6 +12,8 @@ import numpy as np
 class SortBy:
     """Class with static methods for sorting pixels by different criteria."""
 
+    #--- Helper Methods ---
+
     @staticmethod
     def _get_luminance(rgb_slice: np.ndarray) -> np.ndarray:
         """Helper to calculate luminance for a slice of RGB pixels (assumes R=0, G=1, B=2)."""
@@ -55,6 +57,37 @@ class SortBy:
         return lambda rgb, hsv, lab, idx: (SortBy._get_luminance(rgb),)
 
     # --- Sorting Keys (RGB Channels) ---
+
+    @staticmethod
+    def rgb() -> callable:
+        """Sort by red, then green, then blue (RGB)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 0], rgb[:, 1], rgb[:, 2])
+    
+    @staticmethod
+    def rbg() -> callable:
+        """Sort by red, then blue, then green (RBG)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 0], rgb[:, 2], rgb[:, 1])
+    
+    
+    @staticmethod
+    def bgr() -> callable:
+        """Sort by blue, then green, then red (BGR)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 2], rgb[:, 1], rgb[:, 0])
+    
+    @staticmethod
+    def brg() -> callable:
+        """Sort by blue, then red, then green (BRG)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 2], rgb[:, 0], rgb[:, 1])
+
+    @staticmethod
+    def grb() -> callable:
+        """Sort by green, then red, then blue (GRB)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 1], rgb[:, 0], rgb[:, 2])
+    
+    @staticmethod
+    def gbr() -> callable:
+        """Sort by green, then blue, then red (GBR)."""
+        return lambda rgb, hsv, lab, idx: (rgb[:, 1], rgb[:, 2], rgb[:, 0])
     
     @staticmethod
     def color() -> callable:
@@ -112,6 +145,67 @@ class SortBy:
     def distance_edges() -> callable:
         """Sort by distance from the edges of the image (farthest first)."""
         return SortBy._key_gen_distance_edges
+    
+    # --- Other Sorting Keys ---
+
+    @staticmethod
+    def contrast_to_neighbors() -> callable:
+        """
+        Sort by contrast to neighboring pixels.
+        This is a simple approximation using the luminance difference to the mean of the slice.
+        """
+        def key_func(rgb, hsv, lab, idx):
+            luminance = SortBy._get_luminance(rgb)
+            mean_luminance = np.mean(luminance)
+            contrast = np.abs(luminance - mean_luminance)
+            return (contrast,)
+        return key_func
+    
+    @staticmethod
+    def median() -> callable:
+        """
+        Sorts by the median of the RGB values in the slice resulting in a grayscale-like effect.
+        """
+        def key_func(rgb, hsv, lab, idx):
+            median_rgb = np.median(rgb, axis=1)
+            return (median_rgb,)
+        return key_func
+    
+    @staticmethod
+    def mean() -> callable:
+        """
+        Sorts by the mean of the RGB values in the slice resulting in a grayscale-like effect.
+        """
+        def key_func(rgb, hsv, lab, idx):
+            mean_rgb = np.mean(rgb, axis=1)
+            return (mean_rgb,)
+        return key_func
+    
+    @staticmethod
+    def distance_from_color(target_rgb: tuple = (255, 0, 0)) -> callable:
+        """
+        Sorts by proximity to a specific target color (default is pure red).
+        The distance is calculated in the 3D RGB space.
+        """
+        target = np.array(target_rgb)
+        def key_func(rgb, hsv, lab, idx):
+            # Calculate the square of the distance (faster than sqrt and preserves order)
+            distance_sq = np.sum((rgb - target)**2, axis=1)
+            return (distance_sq,)
+        return key_func
+    
+    @staticmethod
+    def chroma() -> callable:
+        """
+        Sorts by the range between the max and min RGB channels.
+        This effectively sorts from grayscale/muted colors to pure, vibrant colors.
+        """
+        def key_func(rgb, hsv, lab, idx):
+            purity = np.max(rgb, axis=1) - np.min(rgb, axis=1)
+            return (purity,)
+        return key_func
+        
+
 
 class Image():
     """Class for image processing tasks."""
