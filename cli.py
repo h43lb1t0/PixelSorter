@@ -155,6 +155,8 @@ def main():
     # --- 3. Instantiate YOLO Model ONCE (Performance Improvement) ---
 
     # --- 4. Main Processing Loop ---
+    if args.yolo:
+        model =YoloSegmentation(model_path=args.model)
     for img_path in tqdm(image_paths, desc="Processing Images"):
         f = io.StringIO()
         with redirect_stdout(f):
@@ -176,7 +178,8 @@ def main():
 
             elif args.yolo:
                 print("-> Generating YOLO mask...")
-                mask = YoloSegmentation(image, model_path=args.model).get_mask(
+                mask = model.get_mask(
+                    image=image,
                     what_to_sort=WhatToSort[args.what_to_sort],
                     conf=args.conf,
                     blur_include=args.blur_include,
