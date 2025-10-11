@@ -29,7 +29,7 @@ class YoloSegmentation():
         Returns:
             Results: The segmentation results from the YOLO model.
         """
-        results = self.model(self.image, conf=conf)
+        results = self.model(self.image, conf=conf, verbose=False)
         print(f"Detected {len(results[0].boxes)} objects with confidence >= {conf}")
         return results[0]
 

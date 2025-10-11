@@ -1,6 +1,8 @@
+import io
 import pathlib
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
-
+from contextlib import redirect_stdout
+from tqdm import tqdm
 import cv2
 from Enums import WhatToSort, SortDirection
 from MaskHandler import YoloSegmentation
@@ -153,52 +155,57 @@ def main():
     # --- 3. Instantiate YOLO Model ONCE (Performance Improvement) ---
 
     # --- 4. Main Processing Loop ---
-    for img_path in image_paths:
-        print(f"\nProcessing: {img_path.name}")
-        suffix = img_path.suffix
-        stem = img_path.stem
-        img_path = str(img_path)
-        image = Image.load_image(img_path)
-        mask = None
+    for img_path in tqdm(image_paths, desc="Processing Images"):
+        f = io.StringIO()
+        with redirect_stdout(f):
+            print(f"Processing: {img_path.name}")
+            suffix = img_path.suffix
+            stem = img_path.stem
+            img_path = str(img_path)
+            image = Image.load_image(img_path)
+            mask = None
 
-        # --- Mask Generation ---
-        if args.mask_image:
-            print(f"-> Using custom mask: {args.mask_image}")
-            mask_path = pathlib.Path(args.mask_image)
-            if mask_path.exists():
-                mask = Image.load_image(str(mask_path), cv2.IMREAD_GRAYSCALE)
-            else:
-                print(f"Warning: Custom mask '{mask_path}' not found. Sorting entire image.")
+            # --- Mask Generation ---
+            if args.mask_image:
+                print(f"-> Using custom mask: {args.mask_image}")
+                mask_path = pathlib.Path(args.mask_image)
+                if mask_path.exists():
+                    mask = Image.load_image(str(mask_path), cv2.IMREAD_GRAYSCALE)
+                else:
+                    print(f"Warning: Custom mask '{mask_path}' not found. Sorting entire image.")
 
-        elif args.yolo:
-            print("-> Generating YOLO mask...")
-            mask = YoloSegmentation(image, model_path=args.model).get_mask(
-                what_to_sort=WhatToSort[args.what_to_sort],
-                conf=args.conf,
-                blur_include=args.blur_include,
-                blur_extend=args.blur_extend
+            elif args.yolo:
+                print("-> Generating YOLO mask...")
+                mask = YoloSegmentation(image, model_path=args.model).get_mask(
+                    what_to_sort=WhatToSort[args.what_to_sort],
+                    conf=args.conf,
+                    blur_include=args.blur_include,
+                    blur_extend=args.blur_extend
+                )
+
+                if args.save_mask_only:
+                    mask_output_path = output_dir / f"{stem}_mask{suffix}"
+                    Image.save_image(mask, mask_output_path)
+                    print(f"   Saved YOLO mask to '{mask_output_path}'")
+                    continue  # Skip to the next image
+
+            # --- Pixel Sorting ---
+            print("-> Sorting pixels...")
+            sorter = PixelSorter(image)
+            sorted_image = sorter.sort_pixels(
+                sort_by=getattr(SortBy, args.sort_by)(),
+                direction=SortDirection[args.sort_direction],
+                mask=mask,
+                use_perlin=args.use_perlin
             )
 
-            if args.save_mask_only:
-                mask_output_path = output_dir / f"{stem}_mask{suffix}"
-                Image.save_image(mask, mask_output_path)
-                print(f"   Saved YOLO mask to '{mask_output_path}'")
-                continue  # Skip to the next image
-
-        # --- Pixel Sorting ---
-        print("-> Sorting pixels...")
-        sorter = PixelSorter(image)
-        sorted_image = sorter.sort_pixels(
-            sort_by=getattr(SortBy, args.sort_by)(),
-            direction=SortDirection[args.sort_direction],
-            mask=mask,
-            use_perlin=args.use_perlin
-        )
-
-        # --- Saving Output ---
-        output_path = output_dir / f"{stem}_sorted{suffix}"
-        Image.save_image(sorted_image, output_path)
-        print(f"   Saved sorted image to '{output_path}'")
+            # --- Saving Output ---
+            output_path = output_dir / f"{stem}_sorted{suffix}"
+            Image.save_image(sorted_image, output_path)
+            print(f"   Saved sorted image to '{output_path}'")
+        captured_output = f.getvalue().strip()
+        if captured_output:
+            tqdm.write(captured_output)
 
     print("\nProcessing complete.")
 
