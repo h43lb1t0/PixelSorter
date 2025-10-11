@@ -9,5 +9,6 @@ dependencies = [
     "perlin-numpy>=0.0.1",
     "pillow>=11.3.0",
     "tkinterdnd2>=0.4.3",
+    "tqdm>=4.67.1",
     "ultralytics>=8.3.204",
 ]
