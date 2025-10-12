@@ -16,3 +16,5 @@ output/*
 out/*
 main.py
 foo.txt
+sorted_by_option/*
+*.ps1

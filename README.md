@@ -131,20 +131,7 @@ sorted_image = PixelSorter(image).sort_pixels(
 
 ## Pixel Sorting Options
 ### SortBy
-- `SortBy.hue()`: Sort by hue.
-- `SortBy.saturation()`: Sort by saturation.
-- `SortBy.brightness()`: Sort by brightness.
-- `SortBy.lightness()`: Sort by lightness.
-- `SortBy.luminance()`: Sort by luminance.
-- `SortBy.color()`: Sort by color (RGB).
-- `SortBy.red()`: Sort by red channel.
-- `SortBy.green()`: Sort by green channel.
-- `SortBy.blue()`: Sort by blue channel.
-- `SortBy.alpha()`: Sort by alpha channel (Only works if the image has an alpha channel).
-- `SortBy.warmth()`: Sort by warmth (red-yellow colors first).
-- `SortBy.distance_center()`: Sort by distance to the center of the image.
-- `SortBy.distance_edges()`: Sort by distance to the nearest edge of the image.
-
+[Here](README_SortBy.md) is a detailed explanation of each sorting option, complete with visual examples.
 ### SortDirection
 - `SortDirection.ROW_LEFT_TO_RIGHT`: Sort rows from left to right.
 - `SortDirection.ROW_RIGHT_TO_LEFT`: Sort rows from right to left.
