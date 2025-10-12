@@ -32,10 +32,10 @@ python UI.py
 
 ### Command Line Interface (CLI)
 ```bash
-usage: cli.py [-h] -i INPUT [-o OUTPUT] [-mi MASK_IMAGE] [-smo] [-yo]
+usage: cli.py [-h] -i INPUT [-o OUTPUT] [-ow] [-mi MASK_IMAGE] [-smo] [-yo]
               [-m MODEL] [-c CONF] [-bi BLUR_INCLUDE] [-be BLUR_EXTEND]
               [-ws {BACKGROUND,FOREGROUND,ALL}]
-              [-sb {hue,saturation,brightness,lightness,luminance,color,red,green,blue,alpha,warmth,distance_center,distance_edges}]
+              [-sb {hue,saturation,brightness,lightness,luminance,rgb,rbg,bgr,brg,grb,gbr,color,red,green,blue,alpha,warmth,distance_center,distance_edges,contrast_to_neighbors,median,mean,distance_from_color,chroma}]
               [-sd {ROW_LEFT_TO_RIGHT,ROW_RIGHT_TO_LEFT,COLUMN_TOP_TO_BOTTOM,COLUMN_BOTTOM_TO_TOP,SPIRALE_INWARD,SPIRALE_OUTWARD}]
               [-p]
 
@@ -47,6 +47,8 @@ options:
 Input/Output:
   -i, --input INPUT     Path to the input image or directory.
   -o, --output OUTPUT   Directory to save the sorted image(s). (Default: out/)
+  -ow, --overwrite      Overwrite an image if it already exists in the output directory. (Default: False)
+                        If not set, a numeric suffix will be added to the output filename to avoid overwriting.
 
 Masking Options:
   -mi, --mask-image MASK_IMAGE
@@ -68,11 +70,12 @@ YOLO Segmentation Options:
                         Specifies which part of the mask to sort. (Default: BACKGROUND)
 
 Sorting Options:
-  -sb, --sort-by {hue,saturation,brightness,lightness,luminance,color,red,green,blue,alpha,warmth,distance_center,distance_edges}
+  -sb, --sort-by {hue,saturation,brightness,lightness,luminance,rgb,rbg,bgr,brg,grb,gbr,color,red,green,blue,alpha,warmth,distance_center,distance_edges,contrast_to_neighbors,median,mean,distance_from_color,chroma}
                         Method for sorting pixels. (Default: hue)
   -sd, --sort-direction {ROW_LEFT_TO_RIGHT,ROW_RIGHT_TO_LEFT,COLUMN_TOP_TO_BOTTOM,COLUMN_BOTTOM_TO_TOP,SPIRALE_INWARD,SPIRALE_OUTWARD}
                         The direction or pattern for the sorting algorithm. (Default: ROW_LEFT_TO_RIGHT)
   -p, --use-perlin      Introduce Perlin noise to randomize the sorting process.
+
 ```
 
 ### Code
